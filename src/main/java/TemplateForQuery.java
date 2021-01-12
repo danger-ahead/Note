@@ -6,9 +6,9 @@ public class TemplateForQuery {
     String userName = "note_user";
     String pass = "";
 
-    public String getNote(String x){  //issue with this method, always returns null
-        String data=null;
-        String query = "select note from notes where timestamp="+x;
+    public String getNote(String x) throws ClassNotFoundException, SQLException{  //issue with this method, always returns null
+        String data = null;
+        String query = "select * from notes where timestamp=" + "'" + x + "'";
 
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -16,22 +16,21 @@ public class TemplateForQuery {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            while (resultSet.next()){
-                data = resultSet.getInt(1) + " -> " + resultSet.getString(3);
-            }
+            resultSet.next();
+            data = resultSet.getInt(1) + " -> " + resultSet.getString(3);
 
             statement.close();
             connection.close();
 
             return data;
         }
-        catch(Exception exception){
-            System.out.println("error!");
+        catch(ClassNotFoundException | SQLException exception){
+            System.out.println("error!\nerror: "+exception);
             return data;
         }
     }
 
-    public void getNote(){
+    public void getNote() throws ClassNotFoundException, SQLException{
         String data;
         String query = "select * from notes";
 
@@ -51,11 +50,11 @@ public class TemplateForQuery {
             connection.close();
         }
         catch (ClassNotFoundException | SQLException exception) {
-            System.out.println("error!");
+            System.out.println("error!\nerror: "+exception);
         }
     }
 
-    public void addNote(String x, String note){
+    public void addNote(String x, String note) throws ClassNotFoundException, SQLException{
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, userName, pass);
@@ -86,11 +85,11 @@ public class TemplateForQuery {
             connection.close();
         }
         catch(SQLException | ClassNotFoundException exception){
-            System.out.println("Error while connecting to the database\n error: "+exception);
+            System.out.println("Error while connecting to the database\nerror: "+exception);
         }
     }
 
-    public void updateNote(String x, String note){
+    public void updateNote(String x, String note) throws ClassNotFoundException, SQLException{
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, userName, pass);
@@ -102,9 +101,32 @@ public class TemplateForQuery {
 
             preparedStatement.executeUpdate();
             System.out.println("note updated");
+
+            preparedStatement.close();
+            connection.close();
         }
         catch(SQLException | ClassNotFoundException exception){
-            System.out.println("Error while connecting to the database\n error: "+exception);
+            System.out.println("Error while connecting to the database\nerror: "+exception);
+        }
+    }
+
+    public void deleteNote(String noteNumber){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, userName, pass);
+
+            PreparedStatement preparedStatement = connection.prepareStatement("delete from notes where notenumber=? LIMIT 1");
+
+            preparedStatement.setString(1,noteNumber);
+
+            preparedStatement.executeUpdate();
+            System.out.println("note deleted");
+
+            preparedStatement.close();
+            connection.close();
+        }
+        catch(SQLException | ClassNotFoundException exception){
+            System.out.println("Error while connecting to the database\nerror: "+exception);
         }
     }
 
@@ -124,6 +146,10 @@ public class TemplateForQuery {
             while( resultSet.next() ) {
                 empty = false;
             }
+
+            preparedStatement.close();
+            connection.close();
+
             return empty;
         }
         catch (SQLException exception) {
