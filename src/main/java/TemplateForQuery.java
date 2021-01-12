@@ -40,7 +40,6 @@ public class TemplateForQuery {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            //resultSet.next();
             while (resultSet.next()) {
                 data = resultSet.getInt(1) + ". " + resultSet.getString(2) + " -> " + resultSet.getString(3);
                 System.out.println(data);
