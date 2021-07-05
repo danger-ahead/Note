@@ -50,7 +50,7 @@ public class Note {
                 }
             }
             else{
-                System.out.println("exiting...");
+                System.out.println("exiting...!");
                 break;
             }
         }
